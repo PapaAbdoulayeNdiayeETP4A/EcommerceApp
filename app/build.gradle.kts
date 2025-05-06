@@ -75,4 +75,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
+
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

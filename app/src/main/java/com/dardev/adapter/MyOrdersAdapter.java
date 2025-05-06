@@ -5,32 +5,21 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.dardev.R;
-import com.dardev.ViewModel.AddFavoriteViewModel;
-import com.dardev.ViewModel.FromCartViewModel;
-import com.dardev.ViewModel.RemoveFavoriteViewModel;
-import com.dardev.databinding.CartItemBinding;
-import com.dardev.databinding.MyOrdersBinding;
 import com.dardev.databinding.MyOrdersItemBinding;
-import com.dardev.databinding.SearchResultListBinding;
 import com.dardev.model.Product;
-import com.dardev.model.SearchProduct;
 import com.dardev.view.OrderDetailsActivity;
-import com.dardev.view.show_product;
 
 public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHolder>
 {

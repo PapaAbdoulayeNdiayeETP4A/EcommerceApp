@@ -1,63 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.dardev">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Permissions Internet nécessaires -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ecommerce_logo"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
 
-        <!-- Activité principale - pas d'intent-filter, peut être false -->
-        <activity
-            android:name=".view.MainActivity"
-            android:exported="false" />
-
-        <!-- Activités sans intent-filter, doivent être explicitement exportées (false) -->
-        <activity
-            android:name=".view.search_result"
-            android:exported="false" />
-
-        <activity
-            android:name=".view.CartActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".view.show_product"
-            android:exported="false" />
-
-        <!-- Activité de lancement avec intent-filter, doit être true -->
-        <activity
-            android:name=".view.sigin_signup"
+        <!-- Activités -->
+        <activity android:name=".view.SignInSignUp"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Autres activités sans intent-filter -->
-        <activity
-            android:name=".view.order_placing"
-            android:exported="false" />
-
-        <activity
-            android:name=".view.AllCategoryActivity"
-            android:exported="false" />
-    
-        <activity
-            android:name=".view.MyOrdersActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".view.OrderDetailsActivity"
-            android:exported="false" />
+        <activity android:name=".view.MainActivity" />
+        <activity android:name=".view.CartActivity" />
+        <activity android:name=".view.MyOrdersActivity" />
+        <activity android:name=".view.OrderDetailsActivity" />
+        <activity android:name=".view.OrderPlacing" />
+        <activity android:name=".view.SearchResult" />
+        <activity android:name=".view.ShowProduct" />
+        <activity android:name=".view.MyWishlistActivity" />
+        <activity android:name=".view.NotificationsActivity" />
+        <activity android:name=".view.ReportActivity" />
+        <activity android:name=".view.MyAccountActivity" />
+        <activity android:name=".view.AllCategoryActivity" />
 
     </application>
+
 </manifest>

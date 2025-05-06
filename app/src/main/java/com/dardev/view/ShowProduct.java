@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.dardev.R;
 
-public class show_product extends AppCompatActivity
+public class ShowProduct extends AppCompatActivity
 {
     Button buy_now;
 
@@ -27,7 +27,7 @@ public class show_product extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                Intent intent = new Intent(show_product.this, order_placing.class);
+                Intent intent = new Intent(ShowProduct.this, OrderPlacing.class);
                 startActivity(intent);
             }
         });

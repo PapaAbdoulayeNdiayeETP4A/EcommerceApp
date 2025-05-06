@@ -14,8 +14,7 @@ import java.util.ArrayList;
 
 import com.dardev.R;
 import com.dardev.model.AllCategory;
-import com.dardev.model.SearchProduct;
-import com.dardev.view.show_product;
+import com.dardev.view.ShowProduct;
 
 public class AllCategoryAdapter extends BaseAdapter
 {
@@ -64,7 +63,7 @@ public class AllCategoryAdapter extends BaseAdapter
             {
                 Toast.makeText(context, i+"", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(context, show_product.class);
+                Intent intent = new Intent(context, ShowProduct.class);
                 context.startActivity(intent);
             }
         });

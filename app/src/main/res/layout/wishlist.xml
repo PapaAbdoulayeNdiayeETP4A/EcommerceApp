@@ -17,30 +17,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="Notifications"
+            app:title="My Wishlist"
             app:titleTextColor="@android:color/black" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/wishlist_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notifications_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:padding="8dp"
-                tools:listitem="@layout/notification_item" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            tools:listitem="@layout/wishlist_item" />
 
         <LinearLayout
-            android:id="@+id/empty_notifications_layout"
+            android:id="@+id/empty_wishlist_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -49,19 +42,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:src="@drawable/placeholder"
-                android:contentDescription="Empty notifications" />
+                android:contentDescription="Empty wishlist" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="No notifications yet"
+                android:text="Your wishlist is empty"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -72,10 +65,22 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:padding="16dp"
-                android:text="We'll notify you about orders, promotions, and more"
+                android:text="Items you add to your wishlist will be saved here"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="16sp" />
 
+            <Button
+                android:id="@+id/continue_shopping_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/continue_background"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
+                android:text="Continue Shopping"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
