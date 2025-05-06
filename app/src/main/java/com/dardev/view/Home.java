@@ -15,7 +15,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
@@ -89,7 +88,7 @@ public class Home extends Fragment
             {
                 if(query.equals("shoes"))
                 {
-                    Intent intent = new Intent(getContext(), search_result.class);
+                    Intent intent = new Intent(getContext(), SearchResult.class);
                     startActivity(intent);
                 }
 

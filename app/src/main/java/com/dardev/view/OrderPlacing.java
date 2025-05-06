@@ -16,7 +16,7 @@ import androidx.databinding.DataBindingUtil;
 import com.dardev.R;
 import com.dardev.databinding.OrderPlacingBinding;
 
-public class order_placing extends AppCompatActivity
+public class OrderPlacing extends AppCompatActivity
 {
     OrderPlacingBinding binding;
     SeekBar seekBar;

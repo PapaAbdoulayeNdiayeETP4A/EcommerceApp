@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,9 +20,6 @@ import com.dardev.ViewModel.CartViewModel;
 import com.dardev.adapter.CartAdapter;
 import com.dardev.databinding.CartBinding;
 import com.dardev.model.Product;
-import com.dardev.storage.LoginUtils;
-
-import static android.os.Build.PRODUCT;
 
 public class CartActivity extends AppCompatActivity
 {
@@ -55,7 +51,7 @@ public class CartActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                Intent intent = new Intent(CartActivity.this, order_placing.class);
+                Intent intent = new Intent(CartActivity.this, OrderPlacing.class);
                 startActivity(intent);
             }
         });

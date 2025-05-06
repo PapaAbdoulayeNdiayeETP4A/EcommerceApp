@@ -1,25 +1,20 @@
 package com.dardev.view;
 
 import android.os.Bundle;
-import android.widget.GridView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import com.dardev.R;
-import com.dardev.ViewModel.CartViewModel;
-import com.dardev.adapter.CartAdapter;
 import com.dardev.adapter.search_result_adapter;
 import com.dardev.databinding.SearchResultBinding;
-import com.dardev.model.SearchProduct;
 
-public class search_result extends AppCompatActivity
+public class SearchResult extends AppCompatActivity
 {
     RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
@@ -42,7 +37,7 @@ public class search_result extends AppCompatActivity
 
     private void setUpRecyclerView()
     {
-        linearLayoutManager = new LinearLayoutManager(search_result.this);
+        linearLayoutManager = new LinearLayoutManager(SearchResult.this);
         recyclerView.setLayoutManager(linearLayoutManager);
         // cartBinding.recyclerview.setHasFixedSize(true);
       //  cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
@@ -58,7 +53,7 @@ public class search_result extends AppCompatActivity
         list.add(new SearchProduct("Cheries",R.drawable.shoes3,"₹600"));*/
 
 
-        search_result_adapter = new search_result_adapter(recyclerView,search_result.this,new ArrayList<Integer>(),new ArrayList<String>(),new ArrayList<String>());
+        search_result_adapter = new search_result_adapter(recyclerView, SearchResult.this,new ArrayList<Integer>(),new ArrayList<String>(),new ArrayList<String>());
 
 
         search_result_adapter.update(R.drawable.shoes1,"Asian WNDR-13 Running Shoes for Men(Green, Grey)","₹300.00");

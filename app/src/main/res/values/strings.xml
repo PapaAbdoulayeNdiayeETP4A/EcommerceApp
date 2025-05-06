@@ -1,6 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">E-Commerce</string>
-    <string name="forgot_password"><u>Forgot Password</u></string>
-    <string name="signup"><u>Sign Up</u></string>
-    <string name="signin"><u>Sign In</u></string>
+    <!-- Valeurs existantes -->
+    <string name="app_name">E-commerce</string>
+    <string name="signup">Sign Up</string>
+    <string name="signin">Sign In</string>
+    <string name="forgot_password">Forgot Password?</string>
+
+    <!-- Nouvelles valeurs -->
+    <!-- Issue types pour ReportActivity -->
+    <string-array name="issue_types">
+        <item>Select an issue type</item>
+        <item>App not working properly</item>
+        <item>Payment problem</item>
+        <item>Delivery issue</item>
+        <item>Product quality issue</item>
+        <item>Account problem</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Messages d'erreur -->
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_invalid_password">Password must be at least 6 characters</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+
+    <!-- Messages de succès -->
+    <string name="success_login">Login successful</string>
+    <string name="success_register">Registration successful</string>
+    <string name="success_added_to_cart">Added to cart</string>
+    <string name="success_added_to_wishlist">Added to wishlist</string>
+    <string name="success_removed_from_wishlist">Removed from wishlist</string>
+
+    <!-- Titres d'écran -->
+    <string name="title_my_account">My Account</string>
+    <string name="title_my_orders">My Orders</string>
+    <string name="title_my_wishlist">My Wishlist</string>
+    <string name="title_cart">Cart</string>
+    <string name="title_order_details">Order Details</string>
+    <string name="title_place_order">Place Order</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_report">Report an Issue</string>
+    <string name="title_all_categories">All Categories</string>
+    <string name="title_search_results">Search Results</string>
+
+    <!-- Boutons -->
+    <string name="button_continue_shopping">Continue Shopping</string>
+    <string name="button_checkout">Checkout</string>
+    <string name="button_add_to_cart">Add to Cart</string>
+    <string name="button_buy_now">Buy Now</string>
+    <string name="button_logout">Logout</string>
+    <string name="button_save">Save</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_submit">Submit</string>
+
+    <!-- Autres -->
+    <string name="no_notifications">No notifications yet</string>
+    <string name="empty_wishlist">Your wishlist is empty</string>
+    <string name="empty_cart">Your cart is empty</string>
+    <string name="no_orders">You haven\'t placed any orders yet</string>
 </resources>
