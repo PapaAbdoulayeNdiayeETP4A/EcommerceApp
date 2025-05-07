@@ -59,11 +59,10 @@ public class AllCategoryAdapter extends BaseAdapter
         view.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view)
-            {
-                Toast.makeText(context, i+"", Toast.LENGTH_SHORT).show();
-
+            public void onClick(View view) {
+                // Transmettre le nom de la catégorie à ShowProduct
                 Intent intent = new Intent(context, ShowProduct.class);
+                intent.putExtra("category", gridPojos.get(i).getTitle());
                 context.startActivity(intent);
             }
         });

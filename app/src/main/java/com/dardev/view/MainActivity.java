@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         break;
                     case R.id.cart:
-
+                        Intent cartIntent = new Intent(MainActivity.this, CartActivity.class);
+                        startActivity(cartIntent);
                         break;
                     case R.id.shopping_bag:
 
@@ -124,7 +125,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 my_orders();
                 break;
             case R.id.cart:
-                cart();
+                Intent cartIntent = new Intent(MainActivity.this, CartActivity.class);
+                startActivity(cartIntent);
                 break;
             case R.id.wishlist:
                 break;

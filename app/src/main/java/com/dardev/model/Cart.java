@@ -1,25 +1,40 @@
 package com.dardev.model;
 
-public class Cart
-{
-    private String cart;
+public class Cart {
+    private int userId;
+    private int productId;
+    private int quantity;
 
-    public Cart(String cart)
-    {
-        this.cart = cart;
+    public Cart(int userId, int productId, int quantity) {
+        this.userId = userId;
+        this.productId = productId;
+        this.quantity = quantity;
     }
 
-    public Cart()
-    {
+    public Cart() {
     }
 
-    public String getCart()
-    {
-        return cart;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setCart(String cart)
-    {
-        this.cart = cart;
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

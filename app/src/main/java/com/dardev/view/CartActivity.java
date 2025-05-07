@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,9 +21,11 @@ import com.dardev.ViewModel.CartViewModel;
 import com.dardev.adapter.CartAdapter;
 import com.dardev.databinding.CartBinding;
 import com.dardev.model.Product;
+import com.dardev.utils.LoginUtils; // Assurez-vous que cette classe existe
 
 public class CartActivity extends AppCompatActivity
 {
+    private static final String TAG = "CartActivity";
     CartBinding cartBinding;
     RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
@@ -30,7 +33,7 @@ public class CartActivity extends AppCompatActivity
     CartViewModel cartViewModel;
     CartAdapter cartAdapter;
 
-    private List<Product> favoriteList;
+    private List<Product> cartList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -43,6 +46,9 @@ public class CartActivity extends AppCompatActivity
         recyclerView = cartBinding.recyclerview;
         continue_button = cartBinding.continueButton;
 
+        // Initialisez la liste vide
+        cartList = new ArrayList<>();
+
         setUpRecyclerView();
         getProductsInCart();
 
@@ -51,8 +57,12 @@ public class CartActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                Intent intent = new Intent(CartActivity.this, OrderPlacing.class);
-                startActivity(intent);
+                if (cartList != null && !cartList.isEmpty()) {
+                    Intent intent = new Intent(CartActivity.this, OrderPlacing.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(CartActivity.this, "Votre panier est vide", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -61,48 +71,76 @@ public class CartActivity extends AppCompatActivity
     {
         linearLayoutManager = new LinearLayoutManager(CartActivity.this);
         recyclerView.setLayoutManager(linearLayoutManager);
-       // cartBinding.recyclerview.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
         cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
+
+        // Initialiser l'adaptateur avec une liste vide
+        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        cartBinding.recyclerview.setAdapter(cartAdapter);
     }
 
     private void getProductsInCart()
     {
-        cartAdapter = new CartAdapter(recyclerView,CartActivity.this,new ArrayList<Integer>(),new ArrayList<String>(),new ArrayList<String>());
+        // Afficher un indicateur de chargement si vous en avez un
+        // cartBinding.loadingIndicator.setVisibility(View.VISIBLE);
 
+        try {
+            // Vérifier si l'utilisateur est connecté
+            int userId = LoginUtils.getInstance(this).getUserInfo().getId();
 
-        cartAdapter.update(R.drawable.shoes1,"Asian WNDR-13 Running Shoes for Men(Green, Grey)","₹300.00");
-        cartAdapter.update(R.drawable.shoes2,"Asian WNDR-13 Running Shoes for Men(Green, Grey)","₹500.00");
+            cartViewModel.getProductsInCart(userId).observe(this, cartApiResponse -> {
+                // Masquer l'indicateur de chargement
+                // cartBinding.loadingIndicator.setVisibility(View.GONE);
 
+                if (cartApiResponse != null && cartApiResponse.getProductsInCart() != null) {
+                    cartList = cartApiResponse.getProductsInCart();
+
+                    if (cartList.size() == 0) {
+                        // Montrer un message "panier vide" si vous en avez un
+                        // cartBinding.emptyCart.setVisibility(View.VISIBLE);
+                        Toast.makeText(CartActivity.this, "Votre panier est vide", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Créer et configurer l'adaptateur avec les données réelles
+                        updateCartAdapter(cartList);
+                    }
+                } else {
+                    Toast.makeText(CartActivity.this, "Erreur lors du chargement du panier", Toast.LENGTH_SHORT).show();
+                    // En cas d'erreur, vous pouvez charger des données statiques pour les tests
+                    loadStaticCartData();
+                }
+            });
+        } catch (Exception e) {
+            // En cas d'erreur (par exemple, utilisateur non connecté)
+            Toast.makeText(CartActivity.this, "Erreur: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            // cartBinding.loadingIndicator.setVisibility(View.GONE);
+            loadStaticCartData();
+        }
+    }
+
+    private void updateCartAdapter(List<Product> products) {
+        ArrayList<Integer> images = new ArrayList<>();
+        ArrayList<String> titles = new ArrayList<>();
+        ArrayList<String> prices = new ArrayList<>();
+
+        for (Product product : products) {
+            // Convertir l'URL de l'image en ressource drawable (ou charger avec Glide/Picasso)
+            // Pour simplifier, utilisez une image par défaut
+            images.add(R.drawable.shoes1);
+            titles.add(product.getProductName());
+            prices.add("₹" + product.getProductPrice());
+        }
+
+        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, images, titles, prices);
         cartBinding.recyclerview.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
+    }
 
-
-       /* cartViewModel.getProductsInCart(LoginUtils.getInstance(this).getUserInfo().getId()).observe(this, cartApiResponse ->
-        {
-            if (cartApiResponse != null)
-            {
-                favoriteList = cartApiResponse.getProductsInCart();
-                if (favoriteList.size() == 0)
-                {
-                    //cartBinding.noBookmarks.setVisibility(View.VISIBLE);
-                   // cartBinding.emptyCart.setVisibility(View.VISIBLE);
-                }
-                else
-                    cartBinding.recyclerview.setVisibility(View.VISIBLE);
-
-                /*cartAdapter = new CartAdapter(getApplicationContext(), favoriteList, product ->
-                {
-                    Intent intent = new Intent(CartActivity.this, order_placing.class);
-                    // Pass an object of product class
-                    intent.putExtra(PRODUCT, (product));
-                    startActivity(intent);
-                }, this);*/
-
-
-            }
-
-           // binding.loadingIndicator.setVisibility(View.GONE);
-
-        //});*/
-
+    private void loadStaticCartData() {
+        // Méthode de secours pour charger des données statiques
+        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, new ArrayList<Integer>(), new ArrayList<String>(), new ArrayList<String>());
+        cartAdapter.update(R.drawable.shoes1, "Asian WNDR-13 Running Shoes for Men(Green, Grey)", "₹300.00");
+        cartAdapter.update(R.drawable.shoes2, "Asian WNDR-13 Running Shoes for Men(Green, Grey)", "₹500.00");
+        cartBinding.recyclerview.setAdapter(cartAdapter);
+        cartAdapter.notifyDataSetChanged();
+    }
 }
