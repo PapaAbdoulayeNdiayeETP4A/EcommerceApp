@@ -3,6 +3,9 @@ package com.dardev.model;
 import com.google.gson.annotations.SerializedName;
 
 public class User {
+    @SerializedName("id")
+    private int id;
+
     @SerializedName("username")
     private String username;
 
@@ -16,6 +19,14 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {

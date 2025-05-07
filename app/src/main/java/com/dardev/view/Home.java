@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,9 @@ import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
@@ -26,28 +30,39 @@ import java.util.List;
 
 import com.dardev.R;
 import com.dardev.SliderItem;
-
+import com.dardev.ViewModel.AddFavoriteViewModel;
+import com.dardev.ViewModel.ProductViewModel;
+import com.dardev.ViewModel.RemoveFavoriteViewModel;
+import com.dardev.adapter.HomeProductAdapter;
 import com.dardev.adapter.slider_adapter;
 import com.dardev.databinding.HomeBinding;
+import com.dardev.model.Product;
+import com.dardev.utils.LoginUtils;
 
+public class Home extends Fragment {
+    private static final String TAG = "HomeFragment";
 
-public class Home extends Fragment
-{
-    //HomeViewModel mViewModel;
     SearchView searchView;
     ImageView cart;
 
     SliderView sliderView;
-    private slider_adapter adapter;
+    private slider_adapter sliderAdapter;
+    private HomeProductAdapter productAdapter;
+
     HomeBinding homeBinding;
     DrawerLayout drawerLayout;
 
+    // ViewModels
+    private ProductViewModel productViewModel;
+    private AddFavoriteViewModel addFavoriteViewModel;
+    private RemoveFavoriteViewModel removeFavoriteViewModel;
+
+    // RecyclerView
+    private RecyclerView newArrivalsRecyclerView;
+
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
-      // View view = inflater.inflate(R.layout.home,container,false);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         homeBinding = DataBindingUtil.inflate(inflater, R.layout.home, container, false);
         View view = homeBinding.getRoot();
 
@@ -55,125 +70,110 @@ public class Home extends Fragment
         searchView = homeBinding.searchView;
         sliderView = homeBinding.imageSlider;
 
+        // Initialiser le RecyclerView pour les nouveaux produits
+        newArrivalsRecyclerView = homeBinding.newArrivalsRecyclerView;
+        newArrivalsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
+        // Initialiser les ViewModels
+        productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+        addFavoriteViewModel = new ViewModelProvider(this).get(AddFavoriteViewModel.class);
+        removeFavoriteViewModel = new ViewModelProvider(this).get(RemoveFavoriteViewModel.class);
+
+        // Charger les produits
+        loadProducts();
 
         getActivity().getWindow().setStatusBarColor(getActivity().getColor(R.color.purple));
 
-       // mViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-      //  mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
-
-       // mViewModel.init();
-
-        /*mViewModel.getUsers().observe(this, users -> {
-            // update UI
-        });*/
-
-      /*  mViewModel.getUsers().observe(getContext(), new Observer<VolumesResponse>()
-        {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onChanged(VolumesResponse volumesResponse)
-            {
-                // update the ui.
-                if(volumesResponse != null)
-                    adapter.setResults(volumesResponse.getItems());
-            }
-        });*/
-
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-        {
-            @Override
-            public boolean onQueryTextSubmit(String query)
-            {
-                if(query.equals("shoes"))
-                {
-                    Intent intent = new Intent(getContext(), SearchResult.class);
-                    startActivity(intent);
-                }
-
+            public boolean onQueryTextSubmit(String query) {
+                Intent intent = new Intent(getContext(), SearchResult.class);
+                intent.putExtra("query", query);
+                startActivity(intent);
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText)
-            {
+            public boolean onQueryTextChange(String newText) {
                 return false;
             }
         });
 
-        cart.setOnClickListener(new View.OnClickListener()
-        {
+        cart.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 Intent intent = new Intent(getContext(), CartActivity.class);
                 startActivity(intent);
             }
         });
 
-
-
-        adapter = new slider_adapter(getContext());
-
-        sliderView.setSliderAdapter(adapter);
-
-        sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM); //set indicator animation by using IndicatorAnimationType. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
-        sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
-        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
-        sliderView.setIndicatorSelectedColor(Color.WHITE);
-        sliderView.setIndicatorUnselectedColor(Color.GRAY);
-        sliderView.setScrollTimeInSec(4); //set scroll delay in seconds :
-        sliderView.startAutoCycle();
-
-        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener()
-        {
-            @Override
-            public void onIndicatorClicked(int position)
-            {
-                Log.i("GGG", "onIndicatorClicked: " + sliderView.getCurrentPagePosition());
-            }
-        });
-
-        addNewItem(view);
-        renewItems(view);
-        removeLastItem(view);
+        // Configurer le slider
+        setupSlider();
 
         return view;
     }
 
-    public void renewItems(View view)
-    {
+    private void loadProducts() {
+        // Récupérer l'ID utilisateur si connecté
+        int userId = -1;
+        if (LoginUtils.getInstance(getContext()).isLoggedIn()) {
+            userId = LoginUtils.getInstance(getContext()).getUserId();
+        }
+
+        // Initialiser l'adaptateur avec une liste vide
+        productAdapter = new HomeProductAdapter(getContext(), new ArrayList<>(),
+                addFavoriteViewModel, removeFavoriteViewModel);
+        newArrivalsRecyclerView.setAdapter(productAdapter);
+
+        // Charger les produits depuis l'API
+        productViewModel.getProducts(1).observe(getViewLifecycleOwner(), productApiResponse -> {
+            if (productApiResponse != null && productApiResponse.getProducts() != null) {
+                List<Product> products = productApiResponse.getProducts();
+                if (!products.isEmpty()) {
+                    productAdapter.setProductList(products);
+                } else {
+                    Toast.makeText(getContext(), "Aucun produit disponible", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Erreur lors du chargement des produits", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupSlider() {
+        sliderAdapter = new slider_adapter(getContext());
+        sliderView.setSliderAdapter(sliderAdapter);
+        sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
+        sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
+        sliderView.setAutoCycleDirection(SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH);
+        sliderView.setIndicatorSelectedColor(Color.WHITE);
+        sliderView.setIndicatorUnselectedColor(Color.GRAY);
+        sliderView.setScrollTimeInSec(4);
+        sliderView.startAutoCycle();
+
+        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
+            @Override
+            public void onIndicatorClicked(int position) {
+                Log.i(TAG, "onIndicatorClicked: " + sliderView.getCurrentPagePosition());
+            }
+        });
+
+        // Ajouter des éléments au slider
+        addSliderItems();
+    }
+
+    private void addSliderItems() {
         List<SliderItem> sliderItemList = new ArrayList<>();
-        //dummy data
-        for (int i = 0; i < 5; i++)
-        {
+        for (int i = 0; i < 5; i++) {
             SliderItem sliderItem = new SliderItem();
             sliderItem.setDescription("Slider Item " + i);
-            if (i % 2 == 0)
-            {
+            if (i % 2 == 0) {
                 sliderItem.setImageUrl("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-            }
-            else
-            {
+            } else {
                 sliderItem.setImageUrl("https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260");
             }
             sliderItemList.add(sliderItem);
         }
-        adapter.renewItems(sliderItemList);
-    }
-
-    public void removeLastItem(View view)
-    {
-        if (adapter.getCount() - 1 >= 0)
-            adapter.deleteItem(adapter.getCount() - 1);
-    }
-
-    public void addNewItem(View view)
-    {
-        SliderItem sliderItem = new SliderItem();
-        sliderItem.setDescription("Slider Item Added Manually");
-        sliderItem.setImageUrl("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-        adapter.addItem(sliderItem);
+        sliderAdapter.renewItems(sliderItemList);
     }
 }

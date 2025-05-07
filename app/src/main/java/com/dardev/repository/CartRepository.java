@@ -7,8 +7,11 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.dardev.model.Cart;
 import com.dardev.model.CartApiResponse;
 import com.dardev.net.RetrofitClient;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,6 +52,28 @@ public class CartRepository
                 Log.d(TAG, "onFailure: " + t.getMessage());
             }
         });
+        return mutableLiveData;
+    }
+
+    public LiveData<ResponseBody> addToCart(Cart cart) {
+        final MutableLiveData<ResponseBody> mutableLiveData = new MutableLiveData<>();
+
+        RetrofitClient.getInstance().getApi().addToCart(cart).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d(TAG, "onResponse: " + response.code());
+
+                if (response.isSuccessful()) {
+                    mutableLiveData.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getMessage());
+            }
+        });
+
         return mutableLiveData;
     }
 }

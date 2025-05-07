@@ -57,7 +57,7 @@ public class LoginUtils {
                 sharedPreferences.getString(KEY_EMAIL, ""),
                 ""
         );
-        // Ici nous ne stockons pas le mot de passe dans les SharedPreferences pour des raisons de sécurité
+        user.setId(sharedPreferences.getInt(KEY_USER_ID, -1));
         return user;
     }
 
