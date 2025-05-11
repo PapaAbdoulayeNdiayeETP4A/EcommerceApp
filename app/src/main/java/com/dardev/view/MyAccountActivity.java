@@ -1,26 +1,25 @@
 package com.dardev.view;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.dardev.R;
+import com.dardev.ViewModel.UserViewModel;
 import com.dardev.databinding.MyAccountBinding;
+import com.dardev.storage.LoginUtils;
 
 public class MyAccountActivity extends AppCompatActivity {
     private static final String TAG = "MyAccountActivity";
 
     private MyAccountBinding binding;
-    private TextView nameTextView, emailTextView;
-    private Button editProfileButton, changePasswordButton, myOrdersButton, myWishlistButton, addressesButton, logoutButton;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,74 +34,91 @@ public class MyAccountActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("My Account");
+            getSupportActionBar().setTitle("Mon Compte");
         }
 
-        // Initialize views
-        nameTextView = binding.userName;
-        emailTextView = binding.userEmail;
-        editProfileButton = binding.editProfileButton;
-        changePasswordButton = binding.changePasswordButton;
-        myOrdersButton = binding.myOrdersButton;
-        myWishlistButton = binding.myWishlistButton;
-        addressesButton = binding.addressesButton;
-        logoutButton = binding.logoutButton;
+        // Initialize ViewModel
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
+        // Vérifier si l'utilisateur est connecté
+//        if (!LoginUtils.getInstance(this).isLoggedIn()) {
+//            // Rediriger vers la page de connexion si non connecté
+//            Toast.makeText(this, "Veuillez vous connecter", Toast.LENGTH_SHORT).show();
+//            startActivity(new Intent(this, SignInSignUp.class));
+//            finish();
+//            return;
+//        }
 
         // Load user data
-        loadUserData();
+        loadUserDataFromApi();
 
         // Setup click listeners
-        editProfileButton.setOnClickListener(v -> {
-            // Navigate to edit profile screen
-            Toast.makeText(MyAccountActivity.this, "Edit Profile feature coming soon", Toast.LENGTH_SHORT).show();
+        setupButtonListeners();
+    }
+
+    private void loadUserDataFromApi() {
+        // Récupérer l'ID de l'utilisateur
+        int userId = LoginUtils.getInstance(this).getUserId();
+        Log.d(TAG, "Chargement des données utilisateur, ID: " + userId);
+
+        // Charger les données utilisateur depuis l'API
+        userViewModel.getUserDetails(userId).observe(this, user -> {
+            if (user != null) {
+                // Mettre à jour l'interface utilisateur avec les données
+                binding.userName.setText(user.getUsername());
+                binding.userEmail.setText(user.getEmail());
+                Log.d(TAG, "Données utilisateur chargées avec succès");
+            } else {
+                Toast.makeText(this, "Erreur lors du chargement des données utilisateur", Toast.LENGTH_SHORT).show();
+                // Charger les données depuis SharedPreferences en cas d'échec
+                loadUserDataFromSharedPreferences();
+            }
+        });
+    }
+
+    private void loadUserDataFromSharedPreferences() {
+        // Méthode de secours pour charger les données depuis SharedPreferences
+        binding.userName.setText(LoginUtils.getInstance(this).getUserInfo().getUsername());
+        binding.userEmail.setText(LoginUtils.getInstance(this).getUserInfo().getEmail());
+    }
+
+    private void setupButtonListeners() {
+        binding.editProfileButton.setOnClickListener(v -> {
+            // Implémentation à venir
+            Toast.makeText(MyAccountActivity.this, "Modification du profil bientôt disponible", Toast.LENGTH_SHORT).show();
         });
 
-        changePasswordButton.setOnClickListener(v -> {
-            // Navigate to change password screen
-            Toast.makeText(MyAccountActivity.this, "Change Password feature coming soon", Toast.LENGTH_SHORT).show();
+        binding.changePasswordButton.setOnClickListener(v -> {
+            // Implémentation à venir
+            Toast.makeText(MyAccountActivity.this, "Changement de mot de passe bientôt disponible", Toast.LENGTH_SHORT).show();
         });
 
-        myOrdersButton.setOnClickListener(v -> {
-            // Navigate to orders screen
+        binding.myOrdersButton.setOnClickListener(v -> {
             Intent intent = new Intent(MyAccountActivity.this, MyOrdersActivity.class);
             startActivity(intent);
         });
 
-        myWishlistButton.setOnClickListener(v -> {
-            // Navigate to wishlist screen
+        binding.myWishlistButton.setOnClickListener(v -> {
             Intent intent = new Intent(MyAccountActivity.this, MyWishlistActivity.class);
             startActivity(intent);
         });
 
-        addressesButton.setOnClickListener(v -> {
-            // Navigate to addresses screen
-            Toast.makeText(MyAccountActivity.this, "Addresses feature coming soon", Toast.LENGTH_SHORT).show();
+        binding.addressesButton.setOnClickListener(v -> {
+            // Implémentation à venir
+            Toast.makeText(MyAccountActivity.this, "Gestion des adresses bientôt disponible", Toast.LENGTH_SHORT).show();
         });
 
-        logoutButton.setOnClickListener(v -> {
-            // Logout user
+        binding.logoutButton.setOnClickListener(v -> {
             logout();
         });
     }
 
-    private void loadUserData() {
-        // In a real app, you would fetch user data from your database or API
-        // For now, we'll use SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String email = prefs.getString("email", "");
-        String name = prefs.getString("username", "User");
-
-        nameTextView.setText(name);
-        emailTextView.setText(email);
-    }
-
     private void logout() {
-        // Clear user data from SharedPreferences
-        SharedPreferences.Editor editor = getSharedPreferences("user_prefs", MODE_PRIVATE).edit();
-        editor.clear();
-        editor.apply();
+        // Déconnecter l'utilisateur
+        LoginUtils.getInstance(this).logout();
+        Toast.makeText(this, "Vous avez été déconnecté", Toast.LENGTH_SHORT).show();
 
-        // Navigate to login screen
+        // Naviguer vers l'écran de connexion
         Intent intent = new Intent(MyAccountActivity.this, SignInSignUp.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

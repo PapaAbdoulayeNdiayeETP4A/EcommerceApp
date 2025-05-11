@@ -45,6 +45,9 @@ public interface Api {
     @POST("users/login")
     Call<LoginApiResponse> loginUser(@Query("email") String email, @Query("password") String password);
 
+    @GET("user-details/{userId}")
+    Call<User> getUserDetails(@Path("userId") int userId);
+
     @DELETE("users/{userId}")
     Call<ResponseBody> deleteAccount(@Path("userId") int userId);
 

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.dardev.model.User;
 import com.dardev.repository.UserRepository;
 
 import okhttp3.MultipartBody;
@@ -42,5 +43,10 @@ public class UserViewModel extends AndroidViewModel {
     public LiveData<Image> getUserImage(int userId) {
         Log.d(TAG, "Getting image for user: " + userId);
         return userRepository.getUserImage(userId);
+    }
+
+    public LiveData<User> getUserDetails(int userId) {
+        Log.d(TAG, "Getting details for user: " + userId);
+        return userRepository.getUserDetails(userId);
     }
 }

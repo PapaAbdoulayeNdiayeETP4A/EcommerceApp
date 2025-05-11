@@ -3,76 +3,77 @@ package com.dardev.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.dardev.view.User;
+import com.dardev.model.User;
 
-
+/**
+ * Classe utilitaire pour gérer les informations d'authentification et de session
+ */
 public class LoginUtils {
+    private static final String SHARED_PREF_NAME = "user_prefs";
+    private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
 
-    private static final String SHARED_PREF_NAME = "shared_preference";
+    private static LoginUtils instance;
+    private SharedPreferences sharedPreferences;
 
-    private static LoginUtils mInstance;
-    private Context mCtx;
-
-    private LoginUtils(Context mCtx) {
-        this.mCtx = mCtx;
+    private LoginUtils(Context context) {
+        sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
     }
 
-
-    public static synchronized LoginUtils getInstance(Context mCtx) {
-        if (mInstance == null) {
-            mInstance = new LoginUtils(mCtx);
+    public static synchronized LoginUtils getInstance(Context context) {
+        if (instance == null) {
+            instance = new LoginUtils(context);
         }
-        return mInstance;
+        return instance;
     }
 
-  /*  public void saveUserInfo(LoginApiResponse response) {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+    /**
+     * Sauvegarde les informations utilisateur dans les SharedPreferences
+     */
+    public void saveUserInfo(int userId, String username, String email) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt("id", response.getId());
-        editor.putString("name", response.getName());
-        editor.putString("email", response.getEmail());
-        editor.putString("password", response.getPassword());
-        editor.putString("token", response.getToken());
-        editor.putBoolean("isAdmin", response.isAdmin());
+        editor.putInt(KEY_USER_ID, userId);
+        editor.putString(KEY_USERNAME, username);
+        editor.putString(KEY_EMAIL, email);
+        editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
     }
 
+    /**
+     * Vérifie si l'utilisateur est connecté
+     */
     public boolean isLoggedIn() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getInt("id", -1) != -1;
+        return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false);
     }
 
-    public void saveUserInfo(User user) {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt("id", user.getId());
-        editor.putString("name", user.getName());
-        editor.putString("email", user.getEmail());
-        editor.putString("password", user.getPassword());
-        editor.putBoolean("isAdmin", user.isAdmin());
-        editor.apply();
-    }*/
-
-    public int getUserInfo() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-       /* return new User(
-                sharedPreferences.getInt("id", -1),
-                sharedPreferences.getString("name", null),
-                sharedPreferences.getString("email", null),
-                sharedPreferences.getString("password", null),
-                sharedPreferences.getBoolean("isAdmin", false)
-        );*/
-
-        return 0;
+    /**
+     * Récupère les informations utilisateur
+     */
+    public User getUserInfo() {
+        User user = new User(
+                sharedPreferences.getString(KEY_USERNAME, ""),
+                sharedPreferences.getString(KEY_EMAIL, ""),
+                ""
+        );
+        user.setId(sharedPreferences.getInt(KEY_USER_ID, -1));
+        return user;
     }
 
-   /* public void clearAll() {
-        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear().apply();
-        editor.apply();
-    }*/
+    /**
+     * Récupère l'ID de l'utilisateur connecté
+     */
+    public int getUserId() {
+        return sharedPreferences.getInt(KEY_USER_ID, -1);
+    }
 
+    /**
+     * Déconnecte l'utilisateur
+     */
+    public void logout() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
 }
