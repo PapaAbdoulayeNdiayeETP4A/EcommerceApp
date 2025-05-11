@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.dardev.model.User;
 import com.dardev.net.RetrofitClient;
 
 import android.media.Image;
@@ -113,6 +114,31 @@ public class UserRepository {
 
             @Override
             public void onFailure(Call<Image> call, Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getMessage());
+            }
+        });
+
+        return mutableLiveData;
+    }
+
+    public LiveData<User> getUserDetails(int userId) {
+        final MutableLiveData<User> mutableLiveData = new MutableLiveData<>();
+
+        // Cette méthode n'existe pas encore dans votre interface Api, il faudra l'ajouter
+        RetrofitClient.getInstance().getApi().getUserDetails(userId).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                Log.d(TAG, "onResponse: " + response.code());
+
+                User user = response.body();
+
+                if (response.body() != null) {
+                    mutableLiveData.setValue(user);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
                 Log.d(TAG, "onFailure: " + t.getMessage());
             }
         });

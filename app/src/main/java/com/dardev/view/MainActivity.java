@@ -8,23 +8,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.internal.NavigationMenu;
 import com.google.android.material.navigation.NavigationView;
 
 import com.dardev.R;
-import com.dardev.model.AllCategory;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     Fragment fragment = null;
@@ -98,8 +90,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     case R.id.user:
 
-                        fragment = new User();
-                        switchfragment(fragment);
+                        Intent myAccountIntent = new Intent(MainActivity.this, UserActivity.class);
+                        startActivity(myAccountIntent);
 
                         break;
 
@@ -131,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.wishlist:
                 break;
             case R.id.account:
+                Intent myAccountIntent = new Intent(MainActivity.this, UserActivity.class);
+                startActivity(myAccountIntent);
                 break;
             case R.id.notifications:
                 break;

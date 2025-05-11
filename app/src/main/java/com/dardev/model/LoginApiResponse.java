@@ -12,6 +12,18 @@ public class LoginApiResponse {
     @SerializedName("user_id")
     private int userId;
 
+    @SerializedName("name")
+    private String name;
+
+    @SerializedName("password")
+    private String password;
+
+    @SerializedName("token")
+    private String token;
+
+    @SerializedName("is_admin")
+    private boolean isAdmin;
+
     @SerializedName("email")
     private String email;
 
@@ -48,5 +60,37 @@ public class LoginApiResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

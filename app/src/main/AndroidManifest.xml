@@ -35,6 +35,7 @@
         <activity android:name=".view.NotificationsActivity" />
         <activity android:name=".view.ReportActivity" />
         <activity android:name=".view.MyAccountActivity" />
+        <activity android:name=".view.UserActivity" />
         <activity android:name=".view.AllCategoryActivity" />
 
     </application>
