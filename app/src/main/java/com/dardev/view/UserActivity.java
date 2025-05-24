@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,14 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.dardev.R;
 import com.dardev.ViewModel.UserViewModel;
+import com.dardev.model.User;
 import com.dardev.storage.LoginUtils;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class UserActivity extends AppCompatActivity {
 
     private static final String TAG = "UserActivity";
 
     private TextView usernameTextView, emailTextView;
-    private Button myAccountButton, loginButton, myOrdersButton, myWishlistButton, addressesButton, logoutButton;
+    private Button myAccountButton, changePasswordButton, loginButton, myOrdersButton, myWishlistButton, addressesButton, logoutButton;
     private UserViewModel userViewModel;
 
     @Override
@@ -35,6 +39,7 @@ public class UserActivity extends AppCompatActivity {
         usernameTextView = findViewById(R.id.user_name);
         emailTextView = findViewById(R.id.user_email);
         myAccountButton = findViewById(R.id.edit_profile_button);
+        changePasswordButton = findViewById(R.id.change_password_button);
         loginButton = findViewById(R.id.logout_button);
         myOrdersButton = findViewById(R.id.my_orders_button);
         myWishlistButton = findViewById(R.id.my_wishlist_button);
@@ -42,7 +47,7 @@ public class UserActivity extends AppCompatActivity {
         logoutButton = findViewById(R.id.logout_button);
 
         // Vérifier si l'utilisateur est connecté
-//        if (LoginUtils.getInstance(this).isLoggedIn()) {
+        if (LoginUtils.getInstance(this).isLoggedIn()) {
             // Charger les données utilisateur depuis l'API
             loadUserDataFromApi();
 
@@ -51,10 +56,10 @@ public class UserActivity extends AppCompatActivity {
 
             // Changer le texte du bouton logout
             logoutButton.setText("Se déconnecter");
-//        } else {
-//            // Afficher l'état non connecté
-//            setupNotLoggedInState();
-//        }
+        } else {
+            // Afficher l'état non connecté
+            setupNotLoggedInState();
+        }
     }
 
     private void loadUserDataFromApi() {
@@ -84,14 +89,19 @@ public class UserActivity extends AppCompatActivity {
     private void setupLoggedInButtonListeners() {
         // Afficher tous les boutons
         myAccountButton.setVisibility(View.VISIBLE);
+        changePasswordButton.setVisibility(View.VISIBLE);
         myOrdersButton.setVisibility(View.VISIBLE);
         myWishlistButton.setVisibility(View.VISIBLE);
         addressesButton.setVisibility(View.VISIBLE);
 
-        // Configurer le bouton "Mon compte"
+        // Configurer le bouton "Modifier profil"
         myAccountButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MyAccountActivity.class);
-            startActivity(intent);
+            showEditProfileDialog();
+        });
+
+        // Configurer le bouton "Changer mot de passe"
+        changePasswordButton.setOnClickListener(v -> {
+            showChangePasswordDialog();
         });
 
         // Configurer les autres boutons
@@ -120,11 +130,138 @@ public class UserActivity extends AppCompatActivity {
         });
     }
 
+    private void showEditProfileDialog() {
+        // Créer un dialog bottom sheet
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_profile, null);
+        dialog.setContentView(dialogView);
+
+        // Initialiser les champs du formulaire
+        TextInputEditText usernameEditText = dialogView.findViewById(R.id.edit_username);
+        TextInputEditText emailEditText = dialogView.findViewById(R.id.edit_email);
+        Button saveButton = dialogView.findViewById(R.id.save_profile_button);
+        Button cancelButton = dialogView.findViewById(R.id.cancel_button);
+        ProgressBar loadingIndicator = dialogView.findViewById(R.id.loading_indicator);
+
+        // Remplir les champs avec les informations actuelles
+        usernameEditText.setText(usernameTextView.getText().toString());
+        emailEditText.setText(emailTextView.getText().toString());
+
+        // Gérer les clics sur les boutons
+        saveButton.setOnClickListener(v -> {
+            // Récupérer les nouvelles valeurs
+            String newUsername = usernameEditText.getText().toString().trim();
+            String newEmail = emailEditText.getText().toString().trim();
+
+            // Validation des champs
+            if (newUsername.isEmpty() || newEmail.isEmpty()) {
+                Toast.makeText(this, "Tous les champs sont requis", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validation basique de l'email
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
+                Toast.makeText(this, "Veuillez entrer une adresse email valide", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Afficher l'indicateur de chargement
+            if (loadingIndicator != null) {
+                loadingIndicator.setVisibility(View.VISIBLE);
+            }
+            saveButton.setEnabled(false);
+
+            // Récupérer l'ID utilisateur
+            int userId = LoginUtils.getInstance(this).getUserId();
+            Log.d(TAG, "Mise à jour du profil pour l'utilisateur ID: " + userId);
+
+            // Appel à l'API via ViewModel
+            userViewModel.updateProfile(newUsername, newEmail, userId).observe(this, response -> {
+                // Masquer l'indicateur de chargement
+                if (loadingIndicator != null) {
+                    loadingIndicator.setVisibility(View.GONE);
+                }
+                saveButton.setEnabled(true);
+
+                if (response != null) {
+                    // Succès
+                    // Mettre à jour l'interface utilisateur
+                    usernameTextView.setText(newUsername);
+                    emailTextView.setText(newEmail);
+
+                    // Mettre à jour les informations locales
+                    User currentUser = LoginUtils.getInstance(this).getUserInfo();
+                    currentUser.setUsername(newUsername);
+                    currentUser.setEmail(newEmail);
+                    LoginUtils.getInstance(this).saveUserInfo(currentUser.getId(), currentUser.getUsername(), currentUser.getEmail());
+
+                    Toast.makeText(this, "Profil mis à jour avec succès", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    // Erreur
+                    Toast.makeText(this, "Erreur lors de la mise à jour du profil", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void showChangePasswordDialog() {
+        // Créer un dialog bottom sheet
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_change_password, null);
+        dialog.setContentView(dialogView);
+
+        // Initialiser les champs du formulaire
+        TextInputEditText currentPasswordEditText = dialogView.findViewById(R.id.current_password);
+        TextInputEditText newPasswordEditText = dialogView.findViewById(R.id.new_password);
+        TextInputEditText confirmPasswordEditText = dialogView.findViewById(R.id.confirm_password);
+        Button saveButton = dialogView.findViewById(R.id.save_password_button);
+        Button cancelButton = dialogView.findViewById(R.id.cancel_button);
+
+        // Gérer les clics sur les boutons
+        saveButton.setOnClickListener(v -> {
+            String currentPassword = currentPasswordEditText.getText().toString();
+            String newPassword = newPasswordEditText.getText().toString();
+            String confirmPassword = confirmPasswordEditText.getText().toString();
+
+            if (currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Tous les champs sont requis", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newPassword.equals(confirmPassword)) {
+                Toast.makeText(this, "Les nouveaux mots de passe ne correspondent pas", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Dans une vraie implémentation, vous vérifieriez le mot de passe actuel et mettriez à jour le nouveau
+            int userId = LoginUtils.getInstance(this).getUserId();
+
+            userViewModel.updatePassword(newPassword, userId).observe(this, response -> {
+                if (response != null) {
+                    Toast.makeText(this, "Mot de passe mis à jour avec succès", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(this, "Erreur lors de la mise à jour du mot de passe", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
     private void setupNotLoggedInState() {
         // Cacher les infos utilisateur et les boutons spécifiques
         usernameTextView.setText("Non connecté");
         emailTextView.setVisibility(View.GONE);
         myAccountButton.setVisibility(View.GONE);
+        changePasswordButton.setVisibility(View.GONE);
         myOrdersButton.setVisibility(View.GONE);
         myWishlistButton.setVisibility(View.GONE);
         addressesButton.setVisibility(View.GONE);
