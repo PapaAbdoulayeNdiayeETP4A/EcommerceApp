@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 import com.dardev.R;
@@ -53,6 +54,17 @@ public class HomeProductAdapter extends RecyclerView.Adapter<HomeProductAdapter.
 
         holder.productName.setText(product.getProductName());
         holder.productPrice.setText("₹" + product.getProductPrice());
+
+        String imageUrl = product.getProductImage(); // Ici, l'URL est directement utilisée
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(context)
+                    .load(imageUrl) // Utilisez l'URL telle qu'elle est reçue
+                    .placeholder(R.drawable.placeholder_image) // Assurez-vous d'avoir ce drawable
+                    .error(R.drawable.error_image) // Assurez-vous d'avoir ce drawable
+                    .into(holder.productImage);
+        } else {
+            holder.productImage.setImageResource(R.drawable.default_product_image); // Assurez-vous d'avoir ce drawable
+        }
 
         // Configuration du bouton favori
         holder.likeButton.setLiked(product.isFavourite() == 1);

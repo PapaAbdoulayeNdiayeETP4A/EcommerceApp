@@ -55,8 +55,12 @@ public interface Api {
     @PUT("users/upload")
     Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part userPhoto, @Part("id") RequestBody userId);
 
-    @PUT("users/info")
+    @PUT("users/update_password")
     Call<ResponseBody> updatePassword(@Query("password") String password, @Query("id") int userId);
+
+    @PUT("users/update_profile")
+    Call<ResponseBody> updateProfile(@Query("username") String username, @Query("email") String email, @Query("id") int userId);
+
 
     @Multipart
     @POST("products/insert")

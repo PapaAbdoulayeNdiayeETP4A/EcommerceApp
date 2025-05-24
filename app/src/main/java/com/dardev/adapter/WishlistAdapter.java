@@ -24,16 +24,27 @@ public class WishlistAdapter extends RecyclerView.Adapter<WishlistAdapter.ViewHo
     private Context context;
     private List<Product> products;
     private OnProductClickListener listener;
+    private OnRemoveFromWishlistListener removeListener;
 
     // Interface for click listener
     public interface OnProductClickListener {
         void onProductClick(Product product);
     }
 
+    // Interface for remove from wishlist listener
+    public interface OnRemoveFromWishlistListener {
+        void onRemoveFromWishlist(Product product, int position);
+    }
+
     public WishlistAdapter(Context context, List<Product> products, OnProductClickListener listener) {
         this.context = context;
         this.products = products;
         this.listener = listener;
+    }
+
+    // Setter pour le listener de suppression
+    public void setOnRemoveFromWishlistListener(OnRemoveFromWishlistListener removeListener) {
+        this.removeListener = removeListener;
     }
 
     @NonNull
@@ -70,12 +81,9 @@ public class WishlistAdapter extends RecyclerView.Adapter<WishlistAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    // Remove from wishlist
-                    products.remove(adapterPosition);
-                    notifyItemRemoved(adapterPosition);
-                    Toast.makeText(context, "Removed from wishlist", Toast.LENGTH_SHORT).show();
-                    // Implement actual remove from wishlist functionality here
+                if (adapterPosition != RecyclerView.NO_POSITION && removeListener != null) {
+                    // Appeler le listener pour supprimer de la base de données
+                    removeListener.onRemoveFromWishlist(product, adapterPosition);
                 }
             }
         });
@@ -84,6 +92,14 @@ public class WishlistAdapter extends RecyclerView.Adapter<WishlistAdapter.ViewHo
     @Override
     public int getItemCount() {
         return products.size();
+    }
+
+    // Méthode pour supprimer un élément après confirmation de suppression de la DB
+    public void removeItem(int position) {
+        if (position >= 0 && position < products.size()) {
+            products.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

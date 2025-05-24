@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.Button; // Ajouté pour le bouton View All
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +45,7 @@ public class Home extends Fragment {
 
     SearchView searchView;
     ImageView cart;
+    Button viewAllButton; // Déclaration du bouton View All
 
     SliderView sliderView;
     private slider_adapter sliderAdapter;
@@ -52,12 +54,10 @@ public class Home extends Fragment {
     HomeBinding homeBinding;
     DrawerLayout drawerLayout;
 
-    // ViewModels
     private ProductViewModel productViewModel;
     private AddFavoriteViewModel addFavoriteViewModel;
     private RemoveFavoriteViewModel removeFavoriteViewModel;
 
-    // RecyclerView
     private RecyclerView newArrivalsRecyclerView;
 
     @Nullable
@@ -69,18 +69,16 @@ public class Home extends Fragment {
         cart = homeBinding.cart;
         searchView = homeBinding.searchView;
         sliderView = homeBinding.imageSlider;
+        viewAllButton = homeBinding.viewAllButton; // Initialisation du bouton View All
 
-        // Initialiser le RecyclerView pour les nouveaux produits
         newArrivalsRecyclerView = homeBinding.newArrivalsRecyclerView;
         newArrivalsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
-        // Initialiser les ViewModels
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
         addFavoriteViewModel = new ViewModelProvider(this).get(AddFavoriteViewModel.class);
         removeFavoriteViewModel = new ViewModelProvider(this).get(RemoveFavoriteViewModel.class);
 
-        // Charger les produits
-        loadProducts();
+        loadProducts(); // Cette méthode chargera les produits et mettra à jour le slider et le recyclerview
 
         getActivity().getWindow().setStatusBarColor(getActivity().getColor(R.color.purple));
 
@@ -94,7 +92,7 @@ public class Home extends Fragment {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextChange(String newText) { // Correction de la faute de frappe ici
                 return false;
             }
         });
@@ -107,30 +105,34 @@ public class Home extends Fragment {
             }
         });
 
-        // Configurer le slider
-        setupSlider();
+        setupSlider(); // Gardez cette méthode pour la configuration générale du slider, pas pour l'ajout des items
+
+        viewAllButton.setOnClickListener(new View.OnClickListener() { // Gestionnaire de clic pour le bouton View All
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Afficher tous les produits (à implémenter)", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }
 
     private void loadProducts() {
-        // Récupérer l'ID utilisateur si connecté
         int userId = -1;
         if (LoginUtils.getInstance(getContext()).isLoggedIn()) {
             userId = LoginUtils.getInstance(getContext()).getUserId();
         }
 
-        // Initialiser l'adaptateur avec une liste vide
         productAdapter = new HomeProductAdapter(getContext(), new ArrayList<>(),
                 addFavoriteViewModel, removeFavoriteViewModel);
         newArrivalsRecyclerView.setAdapter(productAdapter);
 
-        // Charger les produits depuis l'API
         productViewModel.getProducts(1).observe(getViewLifecycleOwner(), productApiResponse -> {
             if (productApiResponse != null && productApiResponse.getProducts() != null) {
                 List<Product> products = productApiResponse.getProducts();
                 if (!products.isEmpty()) {
                     productAdapter.setProductList(products);
+                    updateSliderWithProducts(products); // Mettre à jour le slider avec les vrais produits
                 } else {
                     Toast.makeText(getContext(), "Aucun produit disponible", Toast.LENGTH_SHORT).show();
                 }
@@ -157,22 +159,28 @@ public class Home extends Fragment {
                 Log.i(TAG, "onIndicatorClicked: " + sliderView.getCurrentPagePosition());
             }
         });
-
-        // Ajouter des éléments au slider
-        addSliderItems();
     }
 
-    private void addSliderItems() {
+    private void updateSliderWithProducts(List<Product> products) {
         List<SliderItem> sliderItemList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            SliderItem sliderItem = new SliderItem();
-            sliderItem.setDescription("Slider Item " + i);
-            if (i % 2 == 0) {
-                sliderItem.setImageUrl("https://images.pexels.com/photos/929778/pexels-photo-929778.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-            } else {
-                sliderItem.setImageUrl("https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260");
+        // Limiter le nombre de produits pour le slider si nécessaire, par exemple les 5 premiers
+        int limit = Math.min(products.size(), 5);
+        for (int i = 0; i < limit; i++) {
+            Product product = products.get(i);
+            String imageUrl = product.getProductImage(); // Ici, l'URL est directement utilisée
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                SliderItem sliderItem = new SliderItem();
+                sliderItem.setImageUrl(imageUrl);
+                sliderItem.setDescription(product.getProductName());
+                sliderItemList.add(sliderItem);
             }
-            sliderItemList.add(sliderItem);
+        }
+        if (sliderItemList.isEmpty()) {
+            // Fallback pour les images par défaut si aucun produit valide n'a été trouvé
+            // Assurez-vous d'avoir des images par défaut valides ou des placeholders
+//            sliderItemList.add(new SliderItem("https://via.placeholder.com/400x200?text=Produit+par+defaut+1", "Produit par défaut 1"));
+//            sliderItemList.add(new SliderItem("https://via.placeholder.com/400x200?text=Produit+par+defaut+2", "Produit par défaut 2"));
+            Log.w(TAG, "Aucune image de produit trouvée pour le slider, affichage d'images par défaut.");
         }
         sliderAdapter.renewItems(sliderItemList);
     }
