@@ -6,36 +6,72 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.dardev.model.Order;
 import com.dardev.model.OrderApiResponse;
 import com.dardev.model.Ordering;
-import com.dardev.model.Shipping;
 import com.dardev.repository.OrderRepository;
 
-import okhttp3.ResponseBody;
+import okhttp3.ResponseBody; // Importez ResponseBody
+import java.util.List;
 
 public class OrderViewModel extends AndroidViewModel {
-    private static final String TAG = "OrderViewModel";
 
     private OrderRepository orderRepository;
+    private static final String TAG = "OrderViewModel";
 
     public OrderViewModel(@NonNull Application application) {
         super(application);
         orderRepository = new OrderRepository(application);
     }
 
-    public LiveData<OrderApiResponse> getOrders(int userId) {
-        Log.d(TAG, "Getting orders for user: " + userId);
-        return orderRepository.getOrders(userId);
+    // Récupérer les commandes d'un utilisateur
+    public LiveData<List<Order>> getOrders(int userId) {
+        MutableLiveData<List<Order>> ordersLiveData = new MutableLiveData<>();
+        orderRepository.getOrders(userId).observeForever(response -> {
+            if (response != null && response.getOrders() != null) {
+                ordersLiveData.setValue(response.getOrders());
+            } else {
+                ordersLiveData.setValue(null); // Ou une liste vide
+                Log.e(TAG, "Failed to fetch orders or response is null.");
+            }
+        });
+        return ordersLiveData;
     }
 
-    public LiveData<ResponseBody> addShippingAddress(Shipping shipping) {
-        Log.d(TAG, "Adding shipping address for user: " + shipping.getUserId());
-        return orderRepository.addShippingAddress(shipping);
+    // Placer une nouvelle commande
+    public LiveData<ResponseBody> placeOrder(Ordering ordering) {
+        MutableLiveData<ResponseBody> responseLiveData = new MutableLiveData<>();
+        orderRepository.orderProduct(ordering).observeForever(responseBody -> {
+            if (responseBody != null) {
+                responseLiveData.setValue(responseBody);
+            } else {
+                responseLiveData.setValue(null);
+                Log.e(TAG, "Failed to place order or response is null.");
+            }
+        });
+        return responseLiveData;
     }
 
-    public LiveData<ResponseBody> orderProduct(Ordering ordering) {
-        Log.d(TAG, "Creating order for user: " + ordering.getUserId());
-        return orderRepository.orderProduct(ordering);
+    // Méthode pour obtenir les détails d'une commande spécifique (utilisé par OrderDetailsActivity)
+    public LiveData<Order> getOrderDetails(int orderId, int userId) {
+        MutableLiveData<Order> orderDetailsLiveData = new MutableLiveData<>();
+        getOrders(userId).observeForever(orders -> {
+            if (orders != null) {
+                for (Order order : orders) {
+                    if (order.getId() == orderId) {
+                        orderDetailsLiveData.setValue(order);
+                        break;
+                    }
+                }
+                if (orderDetailsLiveData.getValue() == null) {
+                    Log.e(TAG, "Order with ID " + orderId + " not found for user " + userId);
+                }
+            } else {
+                Log.e(TAG, "No orders found for user " + userId);
+            }
+        });
+        return orderDetailsLiveData;
     }
 }

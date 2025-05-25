@@ -29,4 +29,18 @@ public class CartViewModel extends AndroidViewModel
     public LiveData<ResponseBody> addToCart(Cart cart) {
         return cartRepository.addToCart(cart);
     }
+
+    /**
+     * Supprimer un produit du panier
+     */
+    public LiveData<ResponseBody> removeFromCart(int userId, int productId) {
+        return cartRepository.removeFromCart(userId, productId);
+    }
+
+    /**
+     * Vider complètement le panier
+     */
+//    public LiveData<ResponseBody> clearCart(int userId) {
+//        return cartRepository.clearCart(userId);
+//    }
 }

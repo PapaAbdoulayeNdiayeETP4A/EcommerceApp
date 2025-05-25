@@ -35,7 +35,7 @@ import com.dardev.ViewModel.AddFavoriteViewModel;
 import com.dardev.ViewModel.ProductViewModel;
 import com.dardev.ViewModel.RemoveFavoriteViewModel;
 import com.dardev.adapter.HomeProductAdapter;
-import com.dardev.adapter.slider_adapter;
+import com.dardev.adapter.SliderAdapter;
 import com.dardev.databinding.HomeBinding;
 import com.dardev.model.Product;
 import com.dardev.utils.LoginUtils;
@@ -48,7 +48,7 @@ public class Home extends Fragment {
     Button viewAllButton;
 
     SliderView sliderView;
-    private slider_adapter sliderAdapter;
+    private SliderAdapter sliderAdapter;
     private HomeProductAdapter productAdapter;
 
     HomeBinding homeBinding;
@@ -146,7 +146,7 @@ public class Home extends Fragment {
     }
 
     private void setupSlider() {
-        sliderAdapter = new slider_adapter(getContext());
+        sliderAdapter = new SliderAdapter(getContext());
         sliderView.setSliderAdapter(sliderAdapter);
         sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM);
         sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION);
