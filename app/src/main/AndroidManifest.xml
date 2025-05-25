@@ -16,7 +16,8 @@
         android:usesCleartextTraffic="true">
 
         <!-- Activités -->
-        <activity android:name=".view.SignInSignUp"
+        <activity
+            android:name=".view.SignInSignUp"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,6 +38,9 @@
         <activity android:name=".view.MyAccountActivity" />
         <activity android:name=".view.UserActivity" />
         <activity android:name=".view.AllCategoryActivity" />
+        <activity
+            android:name=".view.AllProductsActivity"
+            android:parentActivityName=".view.MainActivity" />
 
     </application>
 

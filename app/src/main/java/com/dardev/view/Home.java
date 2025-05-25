@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.widget.Button; // Ajouté pour le bouton View All
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,7 +45,7 @@ public class Home extends Fragment {
 
     SearchView searchView;
     ImageView cart;
-    Button viewAllButton; // Déclaration du bouton View All
+    Button viewAllButton;
 
     SliderView sliderView;
     private slider_adapter sliderAdapter;
@@ -78,7 +78,7 @@ public class Home extends Fragment {
         addFavoriteViewModel = new ViewModelProvider(this).get(AddFavoriteViewModel.class);
         removeFavoriteViewModel = new ViewModelProvider(this).get(RemoveFavoriteViewModel.class);
 
-        loadProducts(); // Cette méthode chargera les produits et mettra à jour le slider et le recyclerview
+        loadProducts();
 
         getActivity().getWindow().setStatusBarColor(getActivity().getColor(R.color.purple));
 
@@ -92,7 +92,7 @@ public class Home extends Fragment {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) { // Correction de la faute de frappe ici
+            public boolean onQueryTextChange(String newText) {
                 return false;
             }
         });
@@ -105,12 +105,15 @@ public class Home extends Fragment {
             }
         });
 
-        setupSlider(); // Gardez cette méthode pour la configuration générale du slider, pas pour l'ajout des items
+        setupSlider();
 
-        viewAllButton.setOnClickListener(new View.OnClickListener() { // Gestionnaire de clic pour le bouton View All
+        viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Afficher tous les produits (à implémenter)", Toast.LENGTH_SHORT).show();
+                // Lance l'activité AllProductsActivity lorsque le bouton "View All" est cliqué
+                Intent intent = new Intent(getContext(), AllProductsActivity.class); // <-- MODIFIÉ ICI
+                startActivity(intent);
+                Toast.makeText(getContext(), "Afficher tous les produits", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -132,7 +135,7 @@ public class Home extends Fragment {
                 List<Product> products = productApiResponse.getProducts();
                 if (!products.isEmpty()) {
                     productAdapter.setProductList(products);
-                    updateSliderWithProducts(products); // Mettre à jour le slider avec les vrais produits
+                    updateSliderWithProducts(products);
                 } else {
                     Toast.makeText(getContext(), "Aucun produit disponible", Toast.LENGTH_SHORT).show();
                 }
@@ -163,11 +166,10 @@ public class Home extends Fragment {
 
     private void updateSliderWithProducts(List<Product> products) {
         List<SliderItem> sliderItemList = new ArrayList<>();
-        // Limiter le nombre de produits pour le slider si nécessaire, par exemple les 5 premiers
         int limit = Math.min(products.size(), 5);
         for (int i = 0; i < limit; i++) {
             Product product = products.get(i);
-            String imageUrl = product.getProductImage(); // Ici, l'URL est directement utilisée
+            String imageUrl = product.getProductImage();
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 SliderItem sliderItem = new SliderItem();
                 sliderItem.setImageUrl(imageUrl);
@@ -176,10 +178,6 @@ public class Home extends Fragment {
             }
         }
         if (sliderItemList.isEmpty()) {
-            // Fallback pour les images par défaut si aucun produit valide n'a été trouvé
-            // Assurez-vous d'avoir des images par défaut valides ou des placeholders
-//            sliderItemList.add(new SliderItem("https://via.placeholder.com/400x200?text=Produit+par+defaut+1", "Produit par défaut 1"));
-//            sliderItemList.add(new SliderItem("https://via.placeholder.com/400x200?text=Produit+par+defaut+2", "Produit par défaut 2"));
             Log.w(TAG, "Aucune image de produit trouvée pour le slider, affichage d'images par défaut.");
         }
         sliderAdapter.renewItems(sliderItemList);

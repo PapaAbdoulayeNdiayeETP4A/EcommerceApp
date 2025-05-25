@@ -36,6 +36,10 @@ public class ProductViewModel extends AndroidViewModel {
         return productRepository.getProducts(page);
     }
 
+    public LiveData<ProductApiResponse> getAllProducts() {
+       return productRepository.getAllProducts();
+    }
+
     public LiveData<ProductApiResponse> getProductsByCategory(String category, int userId, int page) {
         Log.d(TAG, "Getting products by category: " + category + ", user: " + userId + ", page: " + page);
         return productRepository.getProductsByCategory(category, userId, page);
