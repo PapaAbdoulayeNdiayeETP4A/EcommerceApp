@@ -75,6 +75,9 @@ public interface Api {
     @GET("products")
     Call<ProductApiResponse> getProducts(@Query("page") int page);
 
+    @GET("all_products")
+    Call<ProductApiResponse> getAllProducts();
+
     @GET("products")
     Call<ProductApiResponse> getProductsByCategory(@Query("category") String category, @Query("userId") int userId, @Query("page") int page);
 

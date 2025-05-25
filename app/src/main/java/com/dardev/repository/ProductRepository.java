@@ -74,6 +74,29 @@ public class ProductRepository {
         return mutableLiveData;
     }
 
+    // Dans com.dardev.ViewModel.ProductViewModel.java
+// ...
+    public LiveData<ProductApiResponse> getAllProducts() {
+        MutableLiveData<ProductApiResponse> data = new MutableLiveData<>();
+        RetrofitClient.getInstance().getApi().getAllProducts().enqueue(new Callback<ProductApiResponse>() {
+            @Override
+            public void onResponse(Call<ProductApiResponse> call, Response<ProductApiResponse> response) {
+                if (response.isSuccessful()) {
+                    data.setValue(response.body());
+                } else {
+                    data.setValue(null); // Gérer l'erreur
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProductApiResponse> call, Throwable t) {
+                data.setValue(null); // Gérer l'échec
+            }
+        });
+        return data;
+    }
+// ...
+
     public LiveData<ProductApiResponse> getProductsByCategory(String category, int userId, int page) {
         final MutableLiveData<ProductApiResponse> mutableLiveData = new MutableLiveData<>();
 
