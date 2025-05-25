@@ -123,6 +123,9 @@ public interface Api {
     @GET("orders/get")
     Call<OrderApiResponse> getOrders(@Query("userId") int userId);
 
+    @POST("orders/place") // Assurez-vous que ce chemin d'API correspond à votre backend
+    Call<ResponseBody> placeOrder(@Body Ordering order);
+
     @POST("address/add")
     Call<ResponseBody> addShippingAddress(@Body Shipping shipping);
 

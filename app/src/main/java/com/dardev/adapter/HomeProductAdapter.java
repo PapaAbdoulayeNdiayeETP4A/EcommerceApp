@@ -82,6 +82,11 @@ public class HomeProductAdapter extends RecyclerView.Adapter<HomeProductAdapter.
                         public void onCallBack() {
                             product.setIsFavourite(true);
                         }
+
+                        @Override
+                        public void onError(String error) {
+
+                        }
                     });
                 }
             }
@@ -95,6 +100,11 @@ public class HomeProductAdapter extends RecyclerView.Adapter<HomeProductAdapter.
                         @Override
                         public void onCallBack() {
                             product.setIsFavourite(false);
+                        }
+
+                        @Override
+                        public void onError(String error) {
+
                         }
                     });
                 }

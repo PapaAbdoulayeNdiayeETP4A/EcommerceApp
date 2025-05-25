@@ -46,6 +46,7 @@
         android:textStyle="bold" />
 
     <ImageView
+        android:id="@+id/delete_icon"
         android:layout_width="50dp"
         android:layout_height="20dp"
         android:src="@drawable/delete"

@@ -24,7 +24,7 @@ import com.dardev.databinding.CartBinding;
 import com.dardev.model.Product;
 import com.dardev.utils.LoginUtils;
 
-public class CartActivity extends AppCompatActivity {
+public class CartActivity extends AppCompatActivity implements CartAdapter.OnItemDeleteListener {
     private static final String TAG = "CartActivity";
     CartBinding cartBinding;
     RecyclerView recyclerView;
@@ -138,28 +138,91 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void updateCartAdapter(List<Product> products) {
-        ArrayList<Integer> images = new ArrayList<>();
+        ArrayList<String> imageUrls = new ArrayList<>(); // Changé de Integer à String pour les URLs
         ArrayList<String> titles = new ArrayList<>();
         ArrayList<String> prices = new ArrayList<>();
 
         for (Product product : products) {
-            // Convertir l'URL de l'image en ressource drawable (ou charger avec Glide/Picasso)
-            // Pour simplifier, utilisez une image par défaut
-            images.add(R.drawable.shoes1);
+            // Utiliser l'URL réelle de l'image du produit
+            imageUrls.add(product.getProductImage());
             titles.add(product.getProductName());
             prices.add(String.format("%.0f FCFA", product.getProductPrice()));
         }
 
-        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, images, titles, prices);
+        // Créer un nouvel adaptateur avec les URLs d'images réelles et le listener de suppression
+        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, imageUrls, titles, prices, this);
         cartBinding.recyclerview.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onItemDelete(int position) {
+        if (cartList != null && position >= 0 && position < cartList.size()) {
+            // Récupérer le produit à supprimer
+            Product productToRemove = cartList.get(position);
+
+            // Supprimer de la liste locale
+            cartList.remove(position);
+
+            // Supprimer du serveur si l'utilisateur est connecté
+            if (LoginUtils.getInstance(this).isLoggedIn()) {
+                int userId = LoginUtils.getInstance(this).getUserId();
+                removeProductFromCart(userId, productToRemove.getProductId());
+            }
+
+            // Mettre à jour l'adaptateur
+            cartAdapter.removeItem(position);
+
+            // Recalculer les totaux
+            calculateCartTotal(cartList);
+
+            // Afficher un message de confirmation
+            Toast.makeText(this, "Produit supprimé du panier", Toast.LENGTH_SHORT).show();
+
+            // Si le panier est vide, afficher le message approprié
+            if (cartList.isEmpty()) {
+                Toast.makeText(this, "Votre panier est vide", Toast.LENGTH_SHORT).show();
+                updateCartTotals(0, 0.0);
+            }
+        }
+    }
+
+    private void removeProductFromCart(int userId, int productId) {
+        // Utiliser le ViewModel pour supprimer le produit du serveur
+        try {
+            cartViewModel.removeFromCart(userId, productId).observe(this, response -> {
+                if (response != null) {
+                    // Succès de la suppression côté serveur
+                    android.util.Log.d(TAG, "Produit supprimé avec succès du serveur");
+                } else {
+                    // Erreur lors de la suppression côté serveur
+                    android.util.Log.e(TAG, "Erreur lors de la suppression côté serveur");
+                    Toast.makeText(this, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Erreur lors de la suppression: " + e.getMessage());
+            Toast.makeText(this, "Erreur: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void loadStaticCartData() {
         // Méthode de secours pour charger des données statiques
-        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, new ArrayList<Integer>(), new ArrayList<String>(), new ArrayList<String>());
-        cartAdapter.update(R.drawable.shoes1, "Asian WNDR-13 Running Shoes for Men(Green, Grey)", "15000 FCFA");
-        cartAdapter.update(R.drawable.shoes2, "Asian WNDR-13 Running Shoes for Men(Green, Grey)", "25000 FCFA");
+        ArrayList<String> staticImages = new ArrayList<>();
+        ArrayList<String> staticTitles = new ArrayList<>();
+        ArrayList<String> staticPrices = new ArrayList<>();
+
+        // Utiliser des URLs d'images par défaut ou des images locales
+        staticImages.add("https://example.com/default-shoe1.jpg"); // ou une URL réelle
+        staticImages.add("https://example.com/default-shoe2.jpg"); // ou une URL réelle
+
+        staticTitles.add("Asian WNDR-13 Running Shoes for Men(Green, Grey)");
+        staticTitles.add("Asian WNDR-13 Running Shoes for Men(Green, Grey)");
+
+        staticPrices.add("15000 FCFA");
+        staticPrices.add("25000 FCFA");
+
+        cartAdapter = new CartAdapter(recyclerView, CartActivity.this, staticImages, staticTitles, staticPrices);
         cartBinding.recyclerview.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
 

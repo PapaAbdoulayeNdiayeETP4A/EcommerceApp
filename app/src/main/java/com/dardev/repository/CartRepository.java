@@ -76,4 +76,22 @@ public class CartRepository
 
         return mutableLiveData;
     }
+
+    public LiveData<ResponseBody> removeFromCart(int userId, int productId) {
+        final MutableLiveData<ResponseBody> mutableLiveData = new MutableLiveData<>();
+
+        RetrofitClient.getInstance().getApi().removeFromCart(userId, productId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                mutableLiveData.setValue(response.isSuccessful() ? response.body() : null);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mutableLiveData.setValue(null);
+            }
+        });
+
+        return mutableLiveData;
+    }
 }

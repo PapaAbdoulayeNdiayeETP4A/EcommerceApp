@@ -18,12 +18,12 @@ import java.util.List;
 import com.dardev.R;
 import com.dardev.SliderItem;
 
-public class slider_adapter extends SliderViewAdapter<slider_adapter.SliderAdapterVH>
+public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapterVH>
 {
     private Context context;
     private List<SliderItem> mSliderItems = new ArrayList<>();
 
-    public slider_adapter(Context context)
+    public SliderAdapter(Context context)
     {
         this.context = context;
     }
