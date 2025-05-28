@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -32,35 +34,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        /*LinearLayout lin_lay_add_paynow = (LinearLayout)findViewById(R.id.home_linear_layout);
 
-        View pay_now_view = getLayoutInflater().inflate(R.layout.home, null);
-        lin_lay_add_paynow.addView(pay_now_view);
-        Button button =  pay_now_view.findViewById(R.id.hamburger);
-
-        button.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });*/
-
-
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-
-      /*  View decorView = getWindow().getDecorView();
-// Hide both the navigation bar and the status bar.
-// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-// a general rule, you should design your app to hide the status bar whenever you
-// hide the navigation bar.
+      View decorView = getWindow().getDecorView();
         int uiOptions =  View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);*/
+        decorView.setSystemUiVisibility(uiOptions);
 
         Drawable background = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.gradient_home);
-        // getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
         getWindow().setBackgroundDrawable(background);
 
@@ -71,33 +51,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.home:
-
                         fragment = new Home();
                         switchfragment(fragment);
-
                         break;
+
                     case R.id.cart:
                         Intent cartIntent = new Intent(MainActivity.this, CartActivity.class);
                         startActivity(cartIntent);
                         break;
-                    case R.id.shopping_bag:
 
+                    case R.id.shopping_bag:
                         break;
 
                     case R.id.message:
-
                         break;
 
                     case R.id.user:
-
                         Intent myAccountIntent = new Intent(MainActivity.this, UserActivity.class);
                         startActivity(myAccountIntent);
-
                         break;
-
                 }
-
-
                 return false;
             }
         });
@@ -121,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(cartIntent);
                 break;
             case R.id.wishlist:
+                Intent wishlistIntent = new Intent(MainActivity.this, MyWishlistActivity.class);
+                startActivity(wishlistIntent);
                 break;
             case R.id.account:
                 Intent myAccountIntent = new Intent(MainActivity.this, UserActivity.class);
