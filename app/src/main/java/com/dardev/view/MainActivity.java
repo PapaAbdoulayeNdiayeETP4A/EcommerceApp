@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(myAccountIntent);
                 break;
             case R.id.notifications:
+                Intent notificationsIntent = new Intent(MainActivity.this, NotificationsActivity.class);
+                startActivity(notificationsIntent);
                 break;
             case R.id.privacy_policy:
                 break;

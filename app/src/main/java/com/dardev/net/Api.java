@@ -13,6 +13,7 @@ import com.dardev.model.History;
 import com.dardev.model.HistoryApiResponse;
 import com.dardev.model.LoginApiResponse;
 import com.dardev.model.NewsFeedResponse;
+import com.dardev.model.NotificationApiResponse;
 import com.dardev.model.OrderApiResponse;
 import com.dardev.model.Ordering;
 import com.dardev.model.Otp;
@@ -123,7 +124,7 @@ public interface Api {
     @GET("orders/get")
     Call<OrderApiResponse> getOrders(@Query("userId") int userId);
 
-    @POST("orders/place") // Assurez-vous que ce chemin d'API correspond à votre backend
+    @POST("orders/place")
     Call<ResponseBody> placeOrder(@Body Ordering order);
 
     @POST("address/add")
@@ -131,4 +132,14 @@ public interface Api {
 
     @POST("orders/add")
     Call<ResponseBody> orderProduct(@Body Ordering ordering);
+
+    // Endpoints pour les notifications
+    @GET("notifications")
+    Call<NotificationApiResponse> getNotifications(@Query("userId") int userId, @Query("page") int page);
+
+    @PUT("notifications/{notificationId}/read")
+    Call<ResponseBody> markNotificationAsRead(@Path("notificationId") int notificationId);
+
+    @DELETE("notifications/{notificationId}")
+    Call<ResponseBody> deleteNotification(@Path("notificationId") int notificationId);
 }

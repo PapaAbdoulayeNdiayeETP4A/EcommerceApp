@@ -45,6 +45,7 @@ public class Home extends Fragment {
 
     SearchView searchView;
     ImageView cart;
+    ImageView notifications;
     Button viewAllButton;
 
     SliderView sliderView;
@@ -67,6 +68,7 @@ public class Home extends Fragment {
         View view = homeBinding.getRoot();
 
         cart = homeBinding.cart;
+        notifications = homeBinding.notifications; // Initialisation de l'icône notifications
         searchView = homeBinding.searchView;
         sliderView = homeBinding.imageSlider;
         viewAllButton = homeBinding.viewAllButton; // Initialisation du bouton View All
@@ -102,6 +104,15 @@ public class Home extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), CartActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        notifications.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), NotificationsActivity.class);
+                startActivity(intent);
+                Toast.makeText(getContext(), "Ouverture des notifications", Toast.LENGTH_SHORT).show();
             }
         });
 

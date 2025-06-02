@@ -1,17 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#E0E0E0" />
-    <corners android:radius="4dp" />
-    <size
-        android:width="100dp"
-        android:height="100dp" />
-    <stroke
-        android:width="1dp"
-        android:color="#BDBDBD" />
-    <padding
-        android:bottom="8dp"
-        android:left="8dp"
-        android:right="8dp"
-        android:top="8dp" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120"
+    android:tint="@color/placeholder_tint">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M60,10C32.39,10 10,32.39 10,60s22.39,50 50,50 50,-22.39 50,-50S87.61,10 60,10zM60,90c-16.54,0 -30,-13.46 -30,-30s13.46,-30 30,-30 30,13.46 30,30S76.54,90 60,90zM65,35h-10v30l26.06,15.54 5,-8.66L65,60V35z"/>
+</vector>

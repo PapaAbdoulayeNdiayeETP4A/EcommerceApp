@@ -10,4 +10,10 @@
     <color name="grey">#4D556A</color>
     <color name="purple">#874AFF</color>
     <color name="red">#FF0000</color>
+
+    <color name="icon_tint">#757575</color>
+    <color name="notification_unread_bg">#F0F8FF</color>
+    <color name="notification_read_bg">#FFFFFF</color>
+    <color name="notification_border">#E3F2FD</color>
+    <color name="placeholder_tint">#BDBDBD</color>
 </resources>

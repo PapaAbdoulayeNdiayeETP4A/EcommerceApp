@@ -1,6 +1,7 @@
 package com.dardev.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private List<Notification> notifications;
     private OnNotificationClickListener listener;
 
-    // Interface for click listener
     public interface OnNotificationClickListener {
         void onNotificationClick(int position);
     }
@@ -46,9 +46,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.titleTextView.setText(notification.getTitle());
         holder.descriptionTextView.setText(notification.getMessage());
         holder.timeTextView.setText(notification.getFormattedTime());
-
-        // Set the appropriate icon based on notification type
         holder.iconImageView.setImageResource(notification.getIconResource());
+
+        // Style différent pour les notifications non lues
+        if (!notification.isRead()) {
+            holder.titleTextView.setTypeface(null, Typeface.BOLD);
+            holder.itemView.setBackgroundResource(R.drawable.unread_notification_background);
+        } else {
+            holder.titleTextView.setTypeface(null, Typeface.NORMAL);
+            holder.itemView.setBackgroundResource(R.drawable.read_notification_background);
+        }
     }
 
     @Override
