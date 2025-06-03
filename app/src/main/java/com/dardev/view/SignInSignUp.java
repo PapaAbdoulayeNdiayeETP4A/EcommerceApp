@@ -71,18 +71,29 @@ public class SignInSignUp extends AppCompatActivity {
                     Log.d(TAG, "Received login response");
 
                     if (response.isSuccess()) {
-                        // Sauvegarder les informations utilisateur
                         saveUserInfo(response.getUserId(), response.getEmail());
-
-                        // Naviguer vers l'activité principale
                         startMainActivity();
                     } else {
-                        // Afficher un message d'erreur
-                        Toast.makeText(SignInSignUp.this,
-                                response.getMessage() != null ? response.getMessage() : "Login failed",
-                                Toast.LENGTH_LONG).show();
+                        String serverMessage = response.getMessage();
+                        String errorMessage;
+
+                        if (serverMessage != null && serverMessage.toLowerCase().contains("unauthorized")) {
+                            errorMessage = "Email ou mot de passe incorrect.";
+                        } else if (serverMessage != null) {
+                            errorMessage = serverMessage;
+                        } else {
+                            errorMessage = "Échec de la connexion. Veuillez réessayer.";
+                        }
+
+                        Toast.makeText(SignInSignUp.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    // Réponse nulle (pas de connexion, erreur serveur)
+                    Toast.makeText(SignInSignUp.this,
+                            "Impossible de se connecter. Vérifiez votre connexion Internet.",
+                            Toast.LENGTH_LONG).show();
                 }
+
             }
         });
 
