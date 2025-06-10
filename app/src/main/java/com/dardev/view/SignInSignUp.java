@@ -29,7 +29,7 @@ public class SignInSignUp extends AppCompatActivity {
     ConstraintLayout signin_page, signup_page;
     Button continue_btn, signup_button;
     TextView signin, signup;
-    TextInputEditText emailInput, passwordInput, nameInput, emailInput2, passwordInput2;
+    TextInputEditText emailInput, passwordInput, nameInput, emailInput2, passwordInput2, reenterPassword;
 
     SigninSignupBinding signinSignupBinding;
     SignInSignUpViewModel signInSignUpViewModel;
@@ -56,6 +56,7 @@ public class SignInSignUp extends AppCompatActivity {
         nameInput = signinSignupBinding.name;
         emailInput2 = signinSignupBinding.email2;
         passwordInput2 = signinSignupBinding.password2;
+        reenterPassword = signinSignupBinding.reenterPassword;
 
         // Configurer la couleur de la barre d'état
         getWindow().setStatusBarColor(getResources().getColor(R.color.white, getTheme()));
@@ -98,27 +99,36 @@ public class SignInSignUp extends AppCompatActivity {
         });
 
         // Observer les réponses d'inscription
-        signInSignUpViewModel.getRegisterResponseLiveData().observe(this, new Observer<RegisterApiResponse>() {
-            @Override
-            public void onChanged(RegisterApiResponse response) {
-                if (response != null) {
-                    Log.d(TAG, "Received register response");
+        signInSignUpViewModel.getRegisterResponseLiveData().observe(this, response -> {
+            if (response != null) {
+                Log.d(TAG, "Received register response");
 
-                    if (response.isSuccess()) {
-                        // Sauvegarder les informations utilisateur
-                        saveUserInfo(response.getUserId(), response.getEmail());
+                if (response.isSuccess()) {
+                    saveUserInfo(response.getUserId(), response.getEmail());
+                    startMainActivity();
+                } else {
+                    String serverMessage = response.getMessage();
+                    String errorMessage;
 
-                        // Naviguer vers l'activité principale
-                        startMainActivity();
+                    if (serverMessage != null && serverMessage.toLowerCase().contains("email already exists")) {
+                        errorMessage = "Cette adresse email est déjà utilisée.";
+                    } else if (serverMessage != null && serverMessage.toLowerCase().contains("invalid email")) {
+                        errorMessage = "Adresse email invalide.";
+                    } else if (serverMessage != null) {
+                        errorMessage = serverMessage;
                     } else {
-                        // Afficher un message d'erreur
-                        Toast.makeText(SignInSignUp.this,
-                                response.getMessage() != null ? response.getMessage() : "Registration failed",
-                                Toast.LENGTH_LONG).show();
+                        errorMessage = "Échec de l'inscription. Veuillez réessayer.";
                     }
+
+                    Toast.makeText(SignInSignUp.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
+            } else {
+                Toast.makeText(SignInSignUp.this,
+                        "Impossible de s’inscrire. Vérifiez votre connexion Internet.",
+                        Toast.LENGTH_LONG).show();
             }
         });
+
 
         // Bouton de connexion
         continue_btn.setOnClickListener(new View.OnClickListener() {
@@ -148,15 +158,17 @@ public class SignInSignUp extends AppCompatActivity {
                 String name = nameInput.getText().toString().trim();
                 String email = emailInput2.getText().toString().trim();
                 String password = passwordInput2.getText().toString().trim();
+                String confirmPassword = reenterPassword.getText().toString().trim(); // Nouveau champ
 
                 // Valider les entrées
-                if (validateRegisterInput(name, email, password)) {
+                if (validateRegisterInput(name, email, password, confirmPassword)) {
                     // Tentative d'inscription
                     User user = new User(name, email, password);
                     signInSignUpViewModel.registerUser(user);
                 }
             }
         });
+
 
         // Basculer vers la page de connexion
         signin.setOnClickListener(new View.OnClickListener() {
@@ -195,29 +207,35 @@ public class SignInSignUp extends AppCompatActivity {
     }
 
     // Valider les entrées d'inscription
-    private boolean validateRegisterInput(String name, String email, String password) {
+    private boolean validateRegisterInput(String name, String email, String password, String confirmPassword) {
         if (name.isEmpty()) {
-            Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Le nom est requis", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (email.isEmpty()) {
-            Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "L'adresse email est requise", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        if (password.isEmpty()) {
-            Toast.makeText(this, "Please enter a password", Toast.LENGTH_SHORT).show();
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Adresse email invalide", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (password.length() < 6) {
-            Toast.makeText(this, "Password should be at least 6 characters", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Le mot de passe doit contenir au moins 6 caractères", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(this, "Les mots de passe ne correspondent pas", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         return true;
     }
+
 
     // Sauvegarder les informations utilisateur
     private void saveUserInfo(int userId, String email) {

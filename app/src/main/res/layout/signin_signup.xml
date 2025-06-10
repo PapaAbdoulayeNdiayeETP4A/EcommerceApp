@@ -304,7 +304,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/reenter_password"
+                android:id="@+id/reenterPassword"
                 android:inputType="textPassword"
                 android:textColor="@color/black"
                 android:maxLines="1"/>
