@@ -53,7 +53,7 @@ public class HomeProductAdapter extends RecyclerView.Adapter<HomeProductAdapter.
         Product product = productList.get(position);
 
         holder.productName.setText(product.getProductName());
-        holder.productPrice.setText("₹" + product.getProductPrice());
+        holder.productPrice.setText(product.getProductPrice() + "F" );
 
         String imageUrl = product.getProductImage(); // Ici, l'URL est directement utilisée
         if (imageUrl != null && !imageUrl.isEmpty()) {

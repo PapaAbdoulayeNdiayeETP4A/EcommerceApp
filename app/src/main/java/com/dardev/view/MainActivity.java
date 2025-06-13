@@ -61,10 +61,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         break;
 
                     case R.id.shopping_bag:
+                        Intent wishlistIntent = new Intent(MainActivity.this, MyWishlistActivity.class);
+                        startActivity(wishlistIntent);
                         break;
 
-                    case R.id.message:
-                        break;
+//                    case R.id.message:
+//                        break;
 
                     case R.id.user:
                         Intent myAccountIntent = new Intent(MainActivity.this, UserActivity.class);
@@ -83,9 +85,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.all_categories:
-                all_category();
-                break;
+//            case R.id.all_categories:
+//                all_category();
+//                break;
             case R.id.orders:
                 my_orders();
                 break;
@@ -105,18 +107,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent notificationsIntent = new Intent(MainActivity.this, NotificationsActivity.class);
                 startActivity(notificationsIntent);
                 break;
-            case R.id.privacy_policy:
-                break;
-            case R.id.legal:
-                break;
-            case R.id.report:
-                break;
-            case R.id.rate:
-                break;
-            case R.id.share:
-                break;
-            case R.id.logout:
-                break;
+//            case R.id.privacy_policy:
+//                break;
+//            case R.id.legal:
+//                break;
+//            case R.id.report:
+//                break;
+//            case R.id.rate:
+//                break;
+//            case R.id.share:
+//                break;
+//            case R.id.logout:
+//                break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;

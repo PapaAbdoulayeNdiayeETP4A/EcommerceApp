@@ -21,11 +21,11 @@
         app:showAsAction="ifRoom"
         android:title="Wishlist" />
 
-    <item
-        android:id="@+id/message"
-        android:icon="@drawable/message"
-        app:showAsAction="ifRoom"
-        android:title="Message" />
+<!--    <item-->
+<!--        android:id="@+id/message"-->
+<!--        android:icon="@drawable/message"-->
+<!--        app:showAsAction="ifRoom"-->
+<!--        android:title="Message" />-->
 
     <item
         android:id="@+id/user"

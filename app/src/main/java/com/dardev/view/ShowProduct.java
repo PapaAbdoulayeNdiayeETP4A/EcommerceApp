@@ -111,7 +111,7 @@ public class ShowProduct extends AppCompatActivity {
 
     private void displayProductDetails() {
         title.setText(currentProduct.getProductName());
-        price.setText("₹" + currentProduct.getProductPrice());
+        price.setText(currentProduct.getProductPrice() + "FCFA");
 
         // Définir l'état initial du bouton favori
         isFavorite = currentProduct.isFavourite() == 1;
